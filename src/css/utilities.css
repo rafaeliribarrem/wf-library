@@ -1,0 +1,15 @@
+/* ================================================================
+   WF-Library — Utility Classes
+   ================================================================ */
+
+.wf-gpu { will-change: transform; transform: translateZ(0); }
+.wf-gradient-text { -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.wf-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wf-line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.wf-line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.wf-smooth-scroll { scroll-behavior: smooth; }
+.wf-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.wf-no-scrollbar::-webkit-scrollbar { display: none; }
+.wf-video-embed { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+.wf-video-embed iframe, .wf-video-embed video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.wf-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }

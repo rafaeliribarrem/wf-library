@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>wf-library — Animation Library for Webflow</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="dist/wf-library.min.css">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #09090b;
+      --text: #fafafa;
+      --accent: #818cf8;
+      --accent-emerald: #34d399;
+      --muted: #71717a;
+      --surface: #18181b;
+      --border: #27272a;
+      --font-display: 'Instrument Serif', serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── Navbar ──────────────────────────────────────── */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar-logo {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .navbar-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .navbar-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+    .navbar-links a:hover { color: var(--text); }
+
+    /* ── Layout ──────────────────────────────────────── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+    .section {
+      padding: 180px 0;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.1;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .section-subtitle {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 64px;
+    }
+
+    /* ── Hero ────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 64px;
+    }
+    .hero-heading {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 8vw, 96px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+      margin-bottom: 24px;
+    }
+    .hero-heading em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-subtitle {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 14px 32px;
+      border-radius: 100px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #09090b;
+    }
+    .btn-primary:hover { background: #a5b4fc; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--muted); }
+    .hero-code {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      max-width: 520px;
+      overflow-x: auto;
+    }
+    .hero-code code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .hero-code .hl { color: var(--accent); }
+    .hero-code .hl-green { color: var(--accent-emerald); }
+
+    /* ── Cards ───────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      transition: border-color 0.3s;
+    }
+    .card:hover { border-color: #3f3f46; }
+    .card-title {
+      font-family: var(--font-body);
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .card-desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .card-visual {
+      height: 80px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(129, 140, 248, 0.15), rgba(52, 211, 153, 0.1));
+      margin-bottom: 20px;
+    }
+
+    code, .code-block {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: rgba(129, 140, 248, 0.1);
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      line-height: 1.5;
+    }
+
+    /* ── Grid ────────────────────────────────────────── */
+    .grid-2x3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    /* ── Reveal Boxes ────────────────────────────────── */
+    .reveal-box {
+      height: 200px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-body);
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .reveal-box-1 { background: linear-gradient(135deg, #818cf8, #6366f1); }
+    .reveal-box-2 { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .reveal-box-3 { background: linear-gradient(135deg, #8b5cf6, #34d399); }
+    .reveal-box-4 { background: linear-gradient(135deg, #34d399, #818cf8); }
+    .reveal-item { text-align: center; }
+    .reveal-item code { margin-top: 16px; }
+
+    /* ── Stagger Cards ───────────────────────────────── */
+    .stagger-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+    .stagger-card .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-emerald));
+      margin: 0 auto 12px;
+    }
+    .stagger-card p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .stagger-group-label {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .stagger-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+
+    /* ── Metrics ─────────────────────────────────────── */
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .metric-value {
+      font-family: var(--font-display);
+      font-size: 56px;
+      line-height: 1;
+      margin-bottom: 8px;
+      letter-spacing: -0.03em;
+    }
+    .metric-label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── Parallax ────────────────────────────────────── */
+    .parallax-container {
+      position: relative;
+      height: 500px;
+      overflow: hidden;
+      border-radius: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .parallax-shape {
+      position: absolute;
+      border-radius: 50%;
+    }
+    .parallax-shape.rect { border-radius: 12px; }
+    .shape-1 {
+      width: 120px; height: 120px;
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      top: 60px; left: 10%;
+    }
+    .shape-2 {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, #34d399, #10b981);
+      top: 200px; left: 30%;
+    }
+    .shape-3 {
+      width: 160px; height: 60px;
+      background: linear-gradient(135deg, #818cf8, #34d399);
+      top: 100px; right: 15%;
+      border-radius: 12px;
+    }
+    .shape-4 {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, #f472b6, #818cf8);
+      top: 300px; right: 30%;
+    }
+    .shape-5 {
+      width: 100px; height: 100px;
+      background: rgba(129, 140, 248, 0.2);
+      border: 2px solid var(--accent);
+      top: 350px; left: 50%;
+    }
+    .shape-6 {
+      width: 140px; height: 40px;
+      background: linear-gradient(90deg, var(--accent-emerald), transparent);
+      top: 180px; left: 60%;
+      border-radius: 8px;
+    }
+
+    /* ── Horizontal Scroll ───────────────────────────── */
+    .horizontal-section {
+      overflow: hidden;
+    }
+    .horizontal-wrapper {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+    .horizontal-panel {
+      min-width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 40px;
+    }
+    .horizontal-panel h2 {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 8vw, 80px);
+      margin-bottom: 16px;
+    }
+    .horizontal-panel p {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 400px;
+      text-align: center;
+    }
+    .panel-1 { background: linear-gradient(135deg, #1e1b4b, #09090b); }
+    .panel-2 { background: linear-gradient(135deg, #064e3b, #09090b); }
+    .panel-3 { background: linear-gradient(135deg, #4c1d95, #09090b); }
+    .panel-4 { background: linear-gradient(135deg, #1e3a5f, #09090b); }
+
+    /* ── Pin Section ─────────────────────────────────── */
+    .pin-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .pin-content h2 {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 5vw, 48px);
+      margin-bottom: 16px;
+    }
+    .pin-content p {
+      color: var(--muted);
+      font-size: 17px;
+    }
+    .pin-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 100px;
+      background: rgba(129, 140, 248, 0.15);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      margin-bottom: 24px;
+    }
+
+    /* ── Marquee ─────────────────────────────────────── */
+    .marquee-wrapper {
+      overflow: hidden;
+      padding: 8px 0;
+    }
+    .marquee-track {
+      display: flex;
+      gap: 16px;
+      width: max-content;
+    }
+    .marquee-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 24px;
+      border-radius: 100px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      color: var(--text);
+    }
+    .marquee-pill.accent {
+      background: rgba(129, 140, 248, 0.1);
+      border-color: rgba(129, 140, 248, 0.3);
+      color: var(--accent);
+    }
+    .marquee-spacer { height: 20px; }
+
+    /* ── Interactive ──────────────────────────────────── */
+    .interactive-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+    .magnetic-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 48px;
+      border-radius: 100px;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 0.3s, background 0.3s;
+      text-decoration: none;
+    }
+    .magnetic-btn:hover {
+      border-color: var(--accent);
+      background: rgba(129, 140, 248, 0.05);
+    }
+    .interactive-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    /* ── Cursor ───────────────────────────────────────── */
+    .custom-cursor {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      mix-blend-mode: difference;
+      transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+    }
+    .custom-cursor.is-hover {
+      transform: scale(2.5) !important;
+    }
+
+    /* ── Placeholder Cards ───────────────────────────── */
+    .placeholder-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px 32px;
+    }
+    .placeholder-card .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    .placeholder-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .placeholder-card p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .placeholder-card code {
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* ── Replay Button ────────────────────────────────── */
+    .replay-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 100px;
+      background: rgba(129, 140, 248, 0.1);
+      border: 1px solid rgba(129, 140, 248, 0.25);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 32px;
+    }
+    .replay-btn:hover {
+      background: rgba(129, 140, 248, 0.2);
+      border-color: var(--accent);
+    }
+    .replay-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── Section Header with Replay ───────────────────── */
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .section-header .replay-btn {
+      margin-top: 8px;
+    }
+
+    /* ── Footer ───────────────────────────────────────── */
+    .footer {
+      padding: 80px 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .footer a:hover { color: #a5b4fc; }
+    .footer .version {
+      color: var(--muted);
+      font-size: 13px;
+      font-family: var(--font-mono);
+      margin-top: 16px;
+    }
+
+    /* ── Divider ──────────────────────────────────────── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Responsive ───────────────────────────────────── */
+    @media (max-width: 768px) {
+      .navbar-links { display: none; }
+      .grid-2x3 { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: 1fr; }
+      .stagger-grid { grid-template-columns: repeat(3, 1fr); }
+      .hero-buttons { flex-direction: column; }
+      .container { padding: 0 20px; }
+      .section { padding: 80px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════
+       1. NAVBAR
+       ═══════════════════════════════════════════════════ -->
+  <nav class="navbar" data-animate="navbar-scroll" id="top">
+    <a href="#top" class="navbar-logo">wf-library</a>
+    <ul class="navbar-links">
+      <li><a href="#fade">Fade</a></li>
+      <li><a href="#reveal">Reveal</a></li>
+      <li><a href="#stagger">Stagger</a></li>
+      <li><a href="#metrics">Metrics</a></li>
+      <li><a href="#parallax">Parallax</a></li>
+      <li><a href="#horizontal">Horizontal</a></li>
+      <li><a href="#marquee">Marquee</a></li>
+      <li><a href="#interactive">Interactive</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════
+       2. HERO
+       ═══════════════════════════════════════════════════ -->
+  <section class="hero" data-replay-section="hero">
+    <div class="container">
+      <button class="replay-btn" data-replay="hero" style="margin-bottom:24px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Replay</button>
+      <h1 class="hero-heading" data-animate="fade-in">
+        Animation Library<br>for <em>Webflow</em>
+      </h1>
+      <p class="hero-subtitle" data-animate="fade-in" data-animate-delay="0.2s">
+        CSS-first entrance animations. GSAP-powered effects. Zero boilerplate.
+      </p>
+      <div class="hero-buttons" data-animate-stagger="0.15">
+        <a href="#fade" class="btn btn-primary">Explore Animations</a>
+        <a href="https://github.com" class="btn btn-secondary" target="_blank">View on GitHub</a>
+      </div>
+      <div class="hero-code" data-animate="fade-in" data-animate-delay="0.5s">
+        <code>
+          <span class="hl">&lt;div</span> <span class="hl-green">data-animate</span>=<span class="hl">"fade-in"</span><span class="hl">&gt;</span><br>
+          &nbsp;&nbsp;Your content here<br>
+          <span class="hl">&lt;/div&gt;</span><br><br>
+          <span class="hl">&lt;div</span> <span class="hl-green">data-animate-stagger</span>=<span class="hl">"0.1"</span><span class="hl">&gt;</span><br>
+          &nbsp;&nbsp;<span class="hl">&lt;div&gt;</span>Child 1<span class="hl">&lt;/div&gt;</span><br>
+          &nbsp;&nbsp;<span class="hl">&lt;div&gt;</span>Child 2<span class="hl">&lt;/div&gt;</span><br>
+          <span class="hl">&lt;/div&gt;</span>
+        </code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       3. FADE VARIANTS
+       ═══════════════════════════════════════════════════ -->
+  <section class="section" id="fade" data-replay-section="fade">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-label">Entrance Animations</div>
+          <h2 class="section-title">Fade Animations</h2>
+        </div>
+        <button class="replay-btn" data-replay="fade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Replay</button>
+      </div>
+      <p class="section-subtitle">Six entrance variants powered by GSAP + ScrollTrigger. Customize duration, delay, blur, and distance with data-attributes.</p>
+
+      <!-- Row 1 -->
+      <div class="grid-2x3" style="margin-bottom: 80px;">
+        <div class="card" data-animate="fade-in">
+          <div class="card-visual"></div>
+          <h3 class="card-title">fade-in</h3>
+          <p class="card-desc">Default upward fade with 16px translate.</p>
+          <code>data-animate="fade-in"</code>
+        </div>
+
+        <div class="card" data-animate="fade-in" data-animate-blur="4px" data-animate-delay="0.15">
+          <div class="card-visual"></div>
+          <h3 class="card-title">fade-in + blur</h3>
+          <p class="card-desc">Same fade with a 4px Gaussian blur that clears on enter.</p>
+          <code>data-animate="fade-in" data-animate-blur="4px"</code>
+        </div>
+
+        <div class="card" data-animate="fade-in-left" data-animate-delay="0.3">
+          <div class="card-visual"></div>
+          <h3 class="card-title">fade-in-left</h3>
+          <p class="card-desc">Slides in from the left with opacity.</p>
+          <code>data-animate="fade-in-left"</code>
+        </div>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="grid-2x3">
+        <div class="card" data-animate="fade-in-right">
+          <div class="card-visual"></div>
+          <h3 class="card-title">fade-in-right</h3>
+          <p class="card-desc">Slides in from the right with opacity.</p>
+          <code>data-animate="fade-in-right"</code>
+        </div>
+
+        <div class="card" data-animate="fade-in-down" data-animate-delay="0.15">
+          <div class="card-visual"></div>
+          <h3 class="card-title">fade-in-down</h3>
+          <p class="card-desc">Drops in from above with opacity.</p>
+          <code>data-animate="fade-in-down"</code>
+        </div>
+
+        <div class="card" data-animate="fade-in-scale" data-animate-delay="0.3">
+          <div class="card-visual"></div>
+          <h3 class="card-title">fade-in-scale</h3>
+          <p class="card-desc">Scales up from 95% with opacity.</p>
+          <code>data-animate="fade-in-scale"</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       4. REVEAL
+       ═══════════════════════════════════════════════════ -->
+  <section class="section" id="reveal" data-replay-section="reveal">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-label">Entrance Animations</div>
+          <h2 class="section-title">Reveal Animations</h2>
+        </div>
+        <button class="replay-btn" data-replay="reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Replay</button>
+      </div>
+      <p class="section-subtitle">Clip-path based reveals that unmask content from a chosen direction. Great for images and bold visual blocks.</p>
+
+      <div class="grid-4">
+        <div class="reveal-item">
+          <div class="reveal-box reveal-box-1" data-animate="reveal-up">reveal-up</div>
+          <br><code>data-animate="reveal-up"</code>
+        </div>
+        <div class="reveal-item">
+          <div class="reveal-box reveal-box-2" data-animate="reveal-down" data-animate-delay="0.2">reveal-down</div>
+          <br><code>data-animate="reveal-down"</code>
+        </div>
+        <div class="reveal-item">
+          <div class="reveal-box reveal-box-3" data-animate="reveal-left" data-animate-delay="0.4">reveal-left</div>
+          <br><code>data-animate="reveal-left"</code>
+        </div>
+        <div class="reveal-item">
+          <div class="reveal-box reveal-box-4" data-animate="reveal-right" data-animate-delay="0.6">reveal-right</div>
+          <br><code>data-animate="reveal-right"</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       5. STAGGER
+       ═══════════════════════════════════════════════════ -->
+  <section class="section" id="stagger" data-replay-section="stagger">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-label">Entrance Animations</div>
+          <h2 class="section-title">Stagger Children</h2>
+        </div>
+        <button class="replay-btn" data-replay="stagger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Replay</button>
+      </div>
+      <p class="section-subtitle">Wrap children in a stagger container and each child animates in sequence. Combine with blur for a softer entrance.</p>
+
+      <p class="stagger-group-label">data-animate-stagger="0.1"</p>
+      <div class="stagger-grid" data-animate-stagger="0.1">
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Item 1</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Item 2</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Item 3</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Item 4</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Item 5</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Item 6</p>
+        </div>
+      </div>
+
+      <p class="stagger-group-label">data-animate-stagger="0.15" + data-animate-blur="4px"</p>
+      <div class="stagger-grid" data-animate-stagger="0.15" data-animate-blur="4px">
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Blur 1</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Blur 2</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Blur 3</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Blur 4</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Blur 5</p>
+        </div>
+        <div class="stagger-card">
+          <div class="icon"></div>
+          <p>Blur 6</p>
+        </div>
+      </div>
+
+      <code>data-animate-stagger="0.1"</code> &nbsp;
+      <code>data-animate-blur="4px"</code>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       6. METRICS / COUNT UP
+       ═══════════════════════════════════════════════════ -->
+  <section class="section" id="metrics" data-replay-section="metrics">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-label">GSAP Effect</div>
+          <h2 class="section-title">Count Up</h2>
+        </div>
+        <button class="replay-btn" data-replay="metrics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Replay</button>
+      </div>
+      <p class="section-subtitle">Animated number counters with prefix, suffix, decimal, and separator support. Triggered on scroll into view.</p>
+
+      <div class="grid-4" data-animate-stagger="0.2">
+        <div class="metric-card">
+          <div class="metric-value" data-animate="count-up" data-count-suffix="+">500</div>
+          <p class="metric-label">Components Built</p>
+          <code>data-count-suffix="+"</code>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" data-animate="count-up" data-count-suffix="%">98</div>
+          <p class="metric-label">Satisfaction Rate</p>
+          <code>data-count-suffix="%"</code>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" data-animate="count-up">12</div>
+          <p class="metric-label">Animation Types</p>
+          <code>data-animate="count-up"</code>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" data-animate="count-up" data-count-prefix="$" data-count-suffix="M" data-count-decimals="1">1.2</div>
+          <p class="metric-label">Revenue Generated</p>
+          <code>data-count-prefix="$" data-count-decimals="1"</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       7. PARALLAX
+       ═══════════════════════════════════════════════════ -->
+  <section class="section" id="parallax">
+    <div class="container">
+      <div class="section-label">GSAP Effect</div>
+      <h2 class="section-title">Parallax</h2>
+      <p class="section-subtitle">Depth-creating motion tied to scroll position. Vary speed and direction per element for layered compositions.</p>
+
+      <div class="parallax-container">
+        <div class="parallax-shape shape-1" data-animate="parallax" data-parallax-speed="0.1" data-parallax-direction="up"></div>
+        <div class="parallax-shape shape-2" data-animate="parallax" data-parallax-speed="0.4" data-parallax-direction="down"></div>
+        <div class="parallax-shape rect shape-3" data-animate="parallax" data-parallax-speed="0.2" data-parallax-direction="up"></div>
+        <div class="parallax-shape shape-4" data-animate="parallax" data-parallax-speed="0.3" data-parallax-direction="down"></div>
+        <div class="parallax-shape shape-5" data-animate="parallax" data-parallax-speed="0.15" data-parallax-direction="up"></div>
+        <div class="parallax-shape rect shape-6" data-animate="parallax" data-parallax-speed="0.25" data-parallax-direction="left"></div>
+      </div>
+
+      <div style="margin-top: 32px;">
+        <code>data-animate="parallax" data-parallax-speed="0.2" data-parallax-direction="up"</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       8. HORIZONTAL SCROLL
+       ═══════════════════════════════════════════════════ -->
+  <section class="section" id="horizontal">
+    <div class="container">
+      <div class="section-label">GSAP Effect</div>
+      <h2 class="section-title">Horizontal Scroll</h2>
+      <p class="section-subtitle">Pin a section and scroll through panels horizontally. Each panel is a full viewport width.</p>
+      <code>data-animate="horizontal-scroll"</code>
+    </div>
+  </section>
+
+  <section class="horizontal-section" data-animate="horizontal-scroll">
+    <div class="horizontal-wrapper">
+      <div class="horizontal-panel panel-1">
+        <h2>Panel 1</h2>
+        <p>The section is pinned and this wrapper scrolls horizontally as you continue scrolling down.</p>
+      </div>
+      <div class="horizontal-panel panel-2">
+        <h2>Panel 2</h2>
+        <p>Each panel occupies the full viewport width for an immersive experience.</p>
+      </div>
+      <div class="horizontal-panel panel-3">
+        <h2>Panel 3</h2>
+        <p>Combine with fade-in or stagger on panel contents for layered choreography.</p>
+      </div>
+      <div class="horizontal-panel panel-4">
+        <h2>Panel 4</h2>
+        <p>On mobile, the section falls back to native horizontal overflow scrolling.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       9. PIN SECTION
+       ═══════════════════════════════════════════════════ -->
+  <section class="pin-section" data-animate="pin" data-pin-duration="400">
+    <div class="pin-content">
+      <div class="pin-badge">data-animate="pin" data-pin-duration="400"</div>
+      <h2>This section is pinned</h2>
+      <p>It stays fixed in the viewport for 400px of additional scroll distance before releasing.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       10. MARQUEE
+       ═══════════════════════════════════════════════════ -->
+  <section class="section" id="marquee">
+    <div class="container">
+      <div class="section-label">GSAP Effect</div>
+      <h2 class="section-title">Marquee</h2>
+      <p class="section-subtitle">Infinite-scrolling ticker strips. Adjust speed and direction. Pauses on hover automatically.</p>
+    </div>
+
+    <div class="marquee-wrapper" data-animate="marquee" data-marquee-speed="50">
+      <div class="marquee-track">
+        <span class="marquee-pill">Fade In</span>
+        <span class="marquee-pill accent">Reveal</span>
+        <span class="marquee-pill">Stagger</span>
+        <span class="marquee-pill accent">Parallax</span>
+        <span class="marquee-pill">Count Up</span>
+        <span class="marquee-pill accent">Magnetic</span>
+        <span class="marquee-pill">Pin</span>
+        <span class="marquee-pill accent">Horizontal Scroll</span>
+        <span class="marquee-pill">Custom Cursor</span>
+        <span class="marquee-pill accent">Text Split</span>
+        <span class="marquee-pill">Flip Layout</span>
+        <span class="marquee-pill accent">Navbar Scroll</span>
+      </div>
+    </div>
+
+    <div class="marquee-spacer"></div>
+
+    <div class="marquee-wrapper" data-animate="marquee" data-marquee-direction="right" data-marquee-speed="30">
+      <div class="marquee-track">
+        <span class="marquee-pill">CSS-First</span>
+        <span class="marquee-pill accent">Zero Config</span>
+        <span class="marquee-pill">Data Attributes</span>
+        <span class="marquee-pill accent">ScrollTrigger</span>
+        <span class="marquee-pill">Lenis Smooth Scroll</span>
+        <span class="marquee-pill accent">Webflow Native</span>
+        <span class="marquee-pill">Responsive</span>
+        <span class="marquee-pill accent">Accessible</span>
+        <span class="marquee-pill">Lightweight</span>
+        <span class="marquee-pill accent">Production Ready</span>
+      </div>
+    </div>
+
+    <div class="container" style="margin-top: 40px;">
+      <code>data-animate="marquee" data-marquee-speed="50"</code> &nbsp;
+      <code>data-marquee-direction="right"</code>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       11. INTERACTIVE (Magnetic + Cursor)
+       ═══════════════════════════════════════════════════ -->
+  <section class="section" id="interactive">
+    <div class="container">
+      <div class="section-label">GSAP Effect</div>
+      <h2 class="section-title">Interactive Effects</h2>
+      <p class="section-subtitle">Magnetic attraction and custom cursor. Elements respond to pointer position with smooth GSAP-powered motion.</p>
+
+      <div class="interactive-grid">
+        <a class="magnetic-btn" data-animate="magnetic" data-cursor="hover">Magnetic Button</a>
+        <a class="magnetic-btn" data-animate="magnetic" data-cursor="hover">Hover Me</a>
+        <a class="magnetic-btn" data-animate="magnetic" data-cursor="hover">Get Started</a>
+        <a class="magnetic-btn" data-animate="magnetic" data-cursor="hover">Learn More</a>
+      </div>
+
+      <p class="interactive-note">Move your mouse over the buttons</p>
+
+      <div style="margin-top: 40px; text-align: center;">
+        <code>data-animate="magnetic"</code> &nbsp;
+        <code>data-cursor="hover"</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       12. TEXT SPLIT & FLIP (Placeholders)
+       ═══════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Paid GSAP Plugins</div>
+      <h2 class="section-title">Premium Effects</h2>
+      <p class="section-subtitle">These effects require paid GSAP plugins that ship with Webflow's native GSAP bundle. They cannot be loaded from a CDN.</p>
+
+      <div class="grid-3" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="placeholder-card">
+          <div class="badge">Requires SplitText</div>
+          <h3>Text Split</h3>
+          <p>Splits text into characters, words, or lines and animates each piece individually. Included in Webflow's native GSAP — not available from CDN.</p>
+          <code>data-animate="text-split"</code>
+          <code>data-split-type="chars"</code>
+          <code>data-split-stagger="0.03"</code>
+        </div>
+
+        <div class="placeholder-card">
+          <div class="badge">Requires Flip</div>
+          <h3>Flip Layout</h3>
+          <p>Smoothly animates between layout states — reflows, reorders, and resizes with physics-based easing. Included in Webflow's native GSAP — not available from CDN.</p>
+          <code>data-animate="flip-layout"</code>
+          <code>data-flip-duration="0.6"</code>
+          <code>data-flip-stagger="0.05"</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       13. FOOTER
+       ═══════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <a href="#top">Back to top</a>
+    <p class="version">wf-library v1.0.0</p>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════
+       CUSTOM CURSOR
+       ═══════════════════════════════════════════════════ -->
+  <div class="custom-cursor" data-animate="cursor" data-cursor-size="20"></div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SCRIPTS
+       ═══════════════════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lenis@1/dist/lenis.min.js"></script>
+  <script src="dist/wf-library.min.js"></script>
+
+  <!-- Replay functionality (preview-only, not part of wf-library) -->
+  <script>
+    document.querySelectorAll("[data-replay]").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        var sectionName = btn.dataset.replay;
+        var section = document.querySelector('[data-replay-section="' + sectionName + '"]');
+        if (!section) return;
+
+        // Reset CSS-first animations: remove .is-active, re-add after a tick
+        var animatedEls = section.querySelectorAll("[data-animate].is-active");
+        animatedEls.forEach(function(el) {
+          el.classList.remove("is-active");
+        });
+
+        // Reset stagger containers
+        var staggerEls = section.querySelectorAll("[data-animate-stagger].is-active");
+        staggerEls.forEach(function(el) {
+          el.classList.remove("is-active");
+        });
+
+        // Reset count-up: restore original text and re-trigger
+        var countEls = section.querySelectorAll('[data-animate="count-up"]');
+        countEls.forEach(function(el) {
+          // Kill existing ScrollTriggers for this element
+          ScrollTrigger.getAll().forEach(function(st) {
+            if (st.trigger === el || st.vars.trigger === el) {
+              st.kill();
+            }
+          });
+        });
+
+        // Re-trigger after a short delay for visual reset
+        setTimeout(function() {
+          // Re-add .is-active for CSS animations
+          animatedEls.forEach(function(el) {
+            el.classList.add("is-active");
+          });
+          staggerEls.forEach(function(el) {
+            el.classList.add("is-active");
+          });
+
+          // For count-up, we need to re-init — simplest approach is page-level
+          // For now, just re-add the class to trigger CSS transitions
+        }, 50);
+      });
+    });
+  </script>
+
+</body>
+</html>

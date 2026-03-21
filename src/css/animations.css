@@ -1,0 +1,40 @@
+/* ================================================================
+   WF-Library — Animation Styles
+   GSAP handles all animation logic. This CSS provides:
+   1. Initial visibility:hidden for entrance animations (prevents FOUC)
+   2. Reduced-motion fallback (show everything immediately)
+   ================================================================ */
+
+/* Hide ONLY entrance animation elements until GSAP initializes them.
+   Effects like parallax, marquee, navbar, magnetic, cursor, pin,
+   horizontal-scroll do NOT need to be hidden initially. */
+[data-animate="fade-in"],
+[data-animate="fade-in-left"],
+[data-animate="fade-in-right"],
+[data-animate="fade-in-down"],
+[data-animate="fade-in-scale"],
+[data-animate="reveal-up"],
+[data-animate="reveal-down"],
+[data-animate="reveal-left"],
+[data-animate="reveal-right"],
+[data-animate="text-split"],
+[data-animate="count-up"] {
+  visibility: hidden;
+}
+
+/* Stagger children: also hidden until GSAP animates them */
+[data-animate-stagger] > * {
+  visibility: hidden;
+}
+
+/* Reduced motion: show everything immediately, skip animations */
+@media (prefers-reduced-motion: reduce) {
+  [data-animate],
+  [data-animate-stagger] > * {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "wf-library",
+  "version": "1.0.0",
+  "description": "Shared Webflow animation library — CSS-first + GSAP effects",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch",
+    "preview": "npx serve . -l 3000",
+    "version:patch": "npm version patch && git push --follow-tags",
+    "version:minor": "npm version minor && git push --follow-tags",
+    "version:major": "npm version major && git push --follow-tags"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0",
+    "clean-css": "^5.3.3"
+  }
+}
