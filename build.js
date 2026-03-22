@@ -27,7 +27,7 @@ async function buildJS() {
     outfile: path.join(DIST, "wf-library.min.js"),
     bundle: true,
     minify: true,
-    sourcemap: true,
+    sourcemap: false,
     target: ["es2020"],
     format: "iife",
   });
@@ -40,7 +40,7 @@ async function buildJS() {
       outfile,
       bundle: false,
       minify: true,
-      sourcemap: true,
+      sourcemap: false,
       target: ["es2020"],
       format: "iife",
     });
