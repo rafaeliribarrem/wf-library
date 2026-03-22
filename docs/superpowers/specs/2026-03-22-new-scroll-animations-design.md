@@ -26,8 +26,13 @@ Image/content starts at reduced scale inside a pinned section. As the user scrol
 - The section element is pinned via ScrollTrigger
 - The first child element (image/div) is the zoom target
 - `gsap.fromTo()` animates the child: `scale: 0.6 → 1`, `borderRadius: 24px → 0`
-- ScrollTrigger config: `pin: true`, `scrub: true`, `start: "top top"`, `end: "+={distance}"`
+- `transformOrigin: "center center"` on the child
+- ScrollTrigger config: `pin: true`, `scrub: 1` (smooth), `start: "top top"`, `end: "+={distance}"`, `invalidateOnRefresh: true`
 - Section needs `overflow: hidden` applied by JS on init
+
+### Reduced motion
+
+Under `prefers-reduced-motion: reduce`: no pin, no animation. Content shown at scale 1 immediately via `gsap.set(child, { scale: 1, borderRadius: 0 })`.
 
 ### HTML structure
 
@@ -40,6 +45,10 @@ Image/content starts at reduced scale inside a pinned section. As the user scrol
 ### Mobile (<768px)
 
 Disable pin. Show content at scale 1 with a simple fade-in entrance.
+
+### Why separate from scale-reveal
+
+zoom-pin targets a **child element** inside the section — the section stays full-size and acts as a window. scale-reveal targets the **section itself** — the entire container grows. These are fundamentally different DOM relationships that affect how content inside is laid out, how padding/margins behave, and how designers think about the structure in Webflow. Merging them into one effect with a toggle would make the attribute API more confusing than having two clearly named effects.
 
 ## Effect 2: scale-reveal
 
@@ -58,13 +67,12 @@ The entire section scales from reduced size with rounded corners to full viewpor
 
 - The section itself is the animation target (unlike zoom-pin which targets a child)
 - `gsap.fromTo()` on the section: `scale: 0.85 → 1`, `borderRadius: 24px → 0`
-- ScrollTrigger config: `pin: true`, `scrub: true`, `start: "top top"`, `end: "+={distance}"`
 - `transformOrigin: "center center"`
+- ScrollTrigger config: `pin: true`, `scrub: 1` (smooth), `start: "top top"`, `end: "+={distance}"`, `invalidateOnRefresh: true`
 
-### Difference from zoom-pin
+### Reduced motion
 
-- `zoom-pin`: inner content grows inside a fixed container (hero images with center focus)
-- `scale-reveal`: the container itself grows (full sections with mixed content)
+Under `prefers-reduced-motion: reduce`: no pin, no animation. Section shown at scale 1 immediately via `gsap.set(el, { scale: 1, borderRadius: 0 })`.
 
 ### HTML structure
 
@@ -93,11 +101,22 @@ Cards stack on top of each other as user scrolls. Previous cards scale down and 
 ### Behavior
 
 - Each child card gets `position: sticky` with incrementing `top` values
-- Top value formula: `baseTop + (index * offset)` where baseTop is derived from navbar height or a sensible default (80px)
-- Container height is set to allow all cards to scroll through: total height accommodates all cards stacking
-- Per-card ScrollTrigger with `scrub: true`: when the next card approaches, the current card animates `scale: 1 → (1 - scaleStep)` and `filter: brightness(0.7)`
+- Top value formula: `baseTop + (index * offset)` where baseTop = 80px (accounts for navbar)
+- z-index: each card gets `z-index: index + 1` so later cards visually stack on top
+- Container height calculation (set via JS): `containerHeight = (numCards × cardHeight) + viewportHeight`. This gives enough scroll distance for all cards to enter and stack. Cards are assumed to have equal height; if heights vary, use the tallest card's height.
+- Per-card ScrollTrigger (except last card):
+  - `trigger`: the next card (card at index + 1)
+  - `start: "top bottom"`
+  - `end: "top top+={baseTop + ((index+1) * offset)}"`
+  - `scrub: 1`
+  - Animates current card: `scale: 1 → (1 - scaleStep)`, `opacity: 1 → 0.7` (opacity instead of filter:brightness for GPU performance)
 - Last card does not scale down — stays at scale 1
 - Cards need explicit height (not auto) for sticky to work reliably
+- `will-change: transform` applied to all cards for GPU compositing
+
+### Reduced motion
+
+Under `prefers-reduced-motion: reduce`: no sticky, no scale animation. Cards stack vertically with full opacity, visible immediately.
 
 ### HTML structure
 
@@ -119,19 +138,19 @@ Disable sticky. Cards stack vertically with fade-in entrance animation.
 All three effects follow existing wf-library conventions:
 
 - Registered via `WF.registerEffect(name, initFn)`
-- Wrapped in `gsap.matchMedia()` for reduced-motion support
-- `WF.onCleanup()` to kill tweens/ScrollTriggers
-- CSS in `animations.css`: add `visibility: hidden` selectors for entrance-type fallbacks if needed
+- Wrapped in `gsap.matchMedia()` with conditions object: `"(prefers-reduced-motion: no-preference)"` for animations, `"(prefers-reduced-motion: reduce)"` for fallbacks
+- `WF.onCleanup()` to kill tweens/ScrollTriggers and restore any CSS properties modified by JS (e.g., `overflow: hidden` on zoom-pin)
 - New JS files in `src/effects/`: `zoom-pin.js`, `scale-reveal.js`, `cards-stack.js`
-- Imported in `src/core/init.js`
+- Imported in `src/core/init.js` via `require()`
+- Lenis compatibility: ScrollTrigger with `pin: true` and Lenis work together natively since Lenis v1+ integrates with ScrollTrigger. No extra config needed.
 
 ## Preview demos
 
 Each effect gets a section in `preview.html` with:
-- Live demo with real visual content (Unsplash images or gradient backgrounds)
+- Live demo (gradient backgrounds for zoom-pin and scale-reveal, styled cards for cards-stack)
 - Code snippet showing the attributes
 - Webflow "How to use" instructions block
-- Replay button (for entrance-based mobile fallbacks)
+- data-replay-section support for the fade section's replay system
 
 ## File changes
 
@@ -142,5 +161,4 @@ Each effect gets a section in `preview.html` with:
 
 ### Modified files
 - `src/core/init.js` — add require() for the 3 new effects
-- `src/css/animations.css` — add visibility:hidden selectors if needed
-- `preview.html` — add demo sections with replay support
+- `preview.html` — add demo sections
