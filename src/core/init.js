@@ -43,6 +43,9 @@
   require("../effects/horizontal-scroll.js");
   require("../effects/pin-section.js");
   require("../effects/flip-layout.js");
+  require("../effects/zoom-pin.js");
+  require("../effects/scale-reveal.js");
+  require("../effects/cards-stack.js");
   require("../utils/smooth-scroll.js");
 
   function initEffects() {
@@ -75,7 +78,7 @@
 
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(function () {
-        ScrollTrigger.refresh();
+        if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh();
       });
     }
   }
